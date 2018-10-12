@@ -4,7 +4,9 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin,UserMa
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from datetime import timedelta
 
+import hashlib
 
 class AccountManager(UserManager):
     def _create_user(self, email, password, **extra_fields):
@@ -54,10 +56,55 @@ class AccountToken(models.Model):
     # アクセス日時
     access_datetime = models.DateTimeField()
 
+    @staticmethod
+    def create(account: Account):
+        # 既存のトークンを取得
+        if AccountToken.objects.filter(user_id=account).exists():
+            # トークンが既に存在している場合は削除する
+            AccountToken.objects.get(user_id=account).delete()
+        
+        # トークン生成（メールアドレス + パスワード + システム日付のハッシュ値とする）
+        dt = timezone.now()
+        str = account.email + account.password + dt.strftime('%Y%m%d%H%M%S%f')
+        hash = hashlib.sha1(str.encode('utf-8')).hexdigest()
+
+        # トークンをデータベースに登録
+        token = AccountToken.objects.create(
+            user_id = account,
+            token = hash,
+            access_datetime = dt
+        )
+
+        return token
+
     def __str__(self):
         # メールアドレスとアクセス日時、トークンが見えるようにする。
         dt = timezone.localtime(self.access_datetime).strftime('%Y/%m/%d %H:%M:%S')
         return self.user_id + '(' + dt + ') - ' + self.token
+
+    @staticmethod
+    def get(token_str: str):
+        # 引数のトークン文字列が存在するかチェック
+        if AccountToken.objects.filter(token=token_str).exists():
+            # 存在した場合はトークンを返却
+            return AccountToken.objects.get(token=token_str)
+        else:
+            # 存在しない場合はNoneを返却
+            return None
+
+    def check_valid_token(self):
+        # このトークンが有効かどうかをチェック
+        delta = timedelta(minutes=30)   # 有効時間は30分
+        if(delta < timezone.now() - self.access_datetime):
+            # 最終アクセス時間から30分以上経過している場合はFalseを返却
+            return False
+
+        return True
+
+    def update_access_datetime(self):
+        # 最終アクセス日時を現在日時で更新
+        self.access_datetime = timezone.now()
+        self.save()
 
 
 class MstClass(models.Model):
@@ -183,12 +230,58 @@ class TblCareer(models.Model):
     company_cd = models.ForeignKey(MstCompany, on_delete=models.CASCADE, blank=True, null=True)
     nearest_station = models.CharField('最寄り駅', max_length=32, blank=True)
 
+    def __str__(self):
+        return str(self.user_id) + ':' + self.project_name
+
     class Meta:
         db_table = 'tbl_career'
         unique_together = (
             ('user_id', 'career_no'),
-        )  
+        )
+    
 
-# class TblCareerOs(models.Model):
-#     user_id = models.ForeignKey(Account, on_delete=models.CASCADE)
-#     career_no = models.ForeignKey(TblCareer, on_delete=models.CASCADE, )
+
+class TblCareerOs(models.Model):
+    career = models.ForeignKey(TblCareer, on_delete=models.CASCADE)
+    os_cd = models.ForeignKey(MstOS, on_delete=models.CASCADE)
+    disp_order = models.IntegerField('表示順')
+
+    class Meta:
+        db_table = 'tbl_career_os'
+        unique_together = (
+            ('career', 'os_cd'),
+        )
+
+class TblCareerLanguage(models.Model):
+    career = models.ForeignKey(TblCareer, on_delete=models.CASCADE)
+    language_cd = models.ForeignKey(MstLanguage, on_delete=models.CASCADE)
+    disp_order = models.IntegerField('表示順')
+
+    class Meta:
+        db_table = 'tbl_career_language'
+        unique_together = (
+            ('career', 'language_cd')
+        )
+
+class TblCareerTool(models.Model):
+    career = models.ForeignKey(TblCareer, on_delete=models.CASCADE)
+    tool_cd = models.ForeignKey(MstTool, on_delete=models.CASCADE)
+    disp_order = models.IntegerField('表示順')
+
+    class Meta:
+        db_table = 'tbl_career_tool'
+        unique_together = (
+            ('career', 'tool_cd')
+        )
+
+class TblCareerDB(models.Model):
+    career = models.ForeignKey(TblCareer, on_delete=models.CASCADE)
+    db_cd = models.ForeignKey(MstDB, on_delete=models.CASCADE)
+    disp_order = models.IntegerField('表示順')
+
+    class Meta:
+        db_table = 'tbl_career_db'
+        unique_together = (
+            ('career', 'db_cd')
+        )
+

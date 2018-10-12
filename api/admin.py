@@ -11,6 +11,10 @@ from .models import MstDB
 from .models import TblPerson
 from .models import TblQualification
 from .models import TblCareer
+from .models import TblCareerOs
+from .models import TblCareerLanguage
+from .models import TblCareerTool
+from .models import TblCareerDB
 
 class AccountAdmin(admin.ModelAdmin):
     list_display = ('user_id', 'email', 'is_staff')   
@@ -59,3 +63,19 @@ admin.site.register(TblQualification, TblQualificationAdmin)
 class TblCareerAdmin(admin.ModelAdmin):
     list_display = ('user_id', 'career_no', 'start_date', 'project_name')
 admin.site.register(TblCareer, TblCareerAdmin)
+
+class TblCareerOsAdmin(admin.ModelAdmin):
+    list_display = ('career', 'os_cd', 'disp_order')
+admin.site.register(TblCareerOs, TblCareerOsAdmin)
+
+class TblCareerLanguageAdmin(admin.ModelAdmin):
+    list_display = ('career', 'language_cd', 'disp_order')
+admin.site.register(TblCareerLanguage, TblCareerLanguageAdmin)
+
+class TblCareerToolAdmin(admin.ModelAdmin):
+    list_display = ('career', 'tool_cd', 'disp_order')
+admin.site.register(TblCareerTool, TblCareerToolAdmin)
+
+class TblCareerDbAdmin(admin.ModelAdmin):
+    list_display = ('career', 'db_cd', 'disp_order')
+admin.site.register(TblCareerDB, TblCareerDbAdmin)

@@ -1,6 +1,10 @@
 from rest_framework import serializers
 from .models import TblPerson
 
+class LoginSerializer(serializers.Serializer):
+    email=serializers.CharField(help_text='ログインユーザーのメールアドレス')
+    password=serializers.CharField(help_text='ログインパスワード')
+
 class TblPersonSerializer(serializers.ModelSerializer):
     class Meta:
         model = TblPerson

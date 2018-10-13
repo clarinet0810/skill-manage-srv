@@ -1,36 +1,39 @@
 from django.http.response import JsonResponse
-from rest_framework import viewsets
+from rest_framework import viewsets, mixins, generics
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .models import Account, AccountToken
 from .models import TblPerson
-from .serializer import TblPersonSerializer
+from .serializer import TblPersonSerializer, LoginSerializer
 from.authentication import TokenAuthentication
 
 import json
 
-class Login(APIView):
-    def post(self, request, format=None):
-        # リクエストボディのJSONを読み込み、メールアドレス、パスワードを取得
-        try:
-            data = json.loads(request.body)
-            email = data['email']
-            password = data['password']
-        except:
-            # JSONの読み込みに失敗
-            return JsonResponse({'message': 'Post data injustice'}, status=400)
+class Login(mixins.CreateModelMixin, generics.GenericAPIView):
+    """
+    スキル管理システムへのログイン処理を提供します。
+    Return the given user
+    """
+    serializer_class = LoginSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        email = serializer.data['email']
+        password = serializer.data['password']
 
         # メールアドレスからユーザを取得
         if not Account.objects.filter(email=email).exists():
             # 存在しない場合は403を返却
-            return JsonResponse({'message': 'Login failure.'}, status=403)
+            return JsonResponse({'message': 'ログインに失敗しました。'}, status=403)
 
         account = Account.objects.get(email=email)
 
         # パスワードチェック
         if not account.check_password(password):
             # チェックエラー
-            return JsonResponse({'message': 'Login failure.'}, status=403)
+            return JsonResponse({'message': 'ログインに失敗しました'}, status=403)
 
         # ログインOKの場合は、トークンを生成
         token = AccountToken.create(account)

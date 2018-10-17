@@ -35,7 +35,7 @@ class AccountManager(UserManager):
 
 class Account(AbstractBaseUser, PermissionsMixin):
 
-    user_id = models.AutoField('ユーザーID', primary_key=True)
+    id = models.AutoField('ID', primary_key=True)
     email = models.EmailField('メールアドレス', unique=True)
     is_staff = models.BooleanField('スタッフ権限', default=False)
 
@@ -108,7 +108,7 @@ class AccountToken(models.Model):
 
 
 class MstClass(models.Model):
-    class_cd = models.IntegerField('区分コード', primary_key=True)
+    id = models.AutoField('ID', primary_key=True)
     class_name = models.CharField('区分名', max_length=64)
     type_1 = models.IntegerField('分類1')
     type_2 = models.IntegerField('分類2')
@@ -122,6 +122,7 @@ class MstClass(models.Model):
 
 
 class MstCompany(models.Model):
+    id = models.AutoField('ID', primary_key=True)
     company_cd = models.IntegerField('企業コード')
     seq_no = models.IntegerField('連番')
     company_name = models.CharField('企業名', max_length=64, unique=True)
@@ -140,10 +141,11 @@ class MstCompany(models.Model):
 
 
 class MstQualification(models.Model):
+    id = models.AutoField('ID', primary_key=True)
     qualification_cd = models.IntegerField('資格コード')
     seq_no = models.IntegerField('連番')
     qualification_name = models.CharField('資格名', max_length=64, unique=True)
-    class_cd = models.ForeignKey(MstClass, on_delete=models.CASCADE)
+    class_cd = models.ForeignKey(MstClass, on_delete=models.CASCADE, verbose_name='区分ID')
 
     class Meta:
         db_table = 'mst_qualification'
@@ -153,44 +155,43 @@ class MstQualification(models.Model):
 
 
 class MstOS(models.Model):
-    os_cd = models.IntegerField('OSコード', primary_key=True)
+    id = models.AutoField('ID', primary_key=True)
     os_name = models.CharField('OS名', max_length=64, unique=True)
-    class_cd = models.ForeignKey(MstClass, on_delete=models.CASCADE)
+    class_id = models.ForeignKey(MstClass, on_delete=models.CASCADE, verbose_name='区分ID')
 
     class Meta:
         db_table = 'mst_os'
 
 
-
 class MstLanguage(models.Model):
-    language_cd = models.IntegerField('言語コード', primary_key=True)
+    id = models.AutoField('言語コード', primary_key=True)
     language_name = models.CharField('言語名', max_length=64, unique=True)
-    class_cd = models.ForeignKey(MstClass, on_delete=models.CASCADE)
+    class_id = models.ForeignKey(MstClass, on_delete=models.CASCADE, verbose_name='区分ID')
 
     class Meta:
         db_table = 'mst_language'
 
 
 class MstTool(models.Model):
-    tool_cd = models.IntegerField('ツールコード', primary_key=True)
+    id = models.AutoField('ID', primary_key=True)
     tool_name = models.CharField('ツール名', max_length=64, unique=True)
-    class_cd = models.ForeignKey(MstClass, on_delete=models.CASCADE)
+    class_id = models.ForeignKey(MstClass, on_delete=models.CASCADE, verbose_name='区分ID')
 
     class Meta:
         db_table = 'mst_tool'
 
 
 class MstDB(models.Model):
-    db_cd = models.IntegerField('DBコード', primary_key=True)
+    id = models.AutoField('ID', primary_key=True)
     db_name = models.CharField('DB名', max_length=64, unique=True)
-    class_cd = models.ForeignKey(MstClass, on_delete=models.CASCADE)
+    class_id = models.ForeignKey(MstClass, on_delete=models.CASCADE, verbose_name='区分ID')
 
     class Meta:
         db_table = 'mst_db'
 
 
 class TblPerson(models.Model):
-    user_id = models.OneToOneField(Account, on_delete=models.CASCADE, primary_key=True)
+    user_id = models.OneToOneField(Account, on_delete=models.CASCADE, primary_key=True, verbose_name='ユーザーID')
     last_name = models.CharField('姓', max_length=16, blank=True)
     last_name_kana = models.CharField('姓かな', max_length=16, blank=True)
     first_name = models.CharField('名', max_length=16, blank=True)
@@ -199,26 +200,28 @@ class TblPerson(models.Model):
     birthday = models.DateField('生年月日', blank=True, null=True)
     nearest_station = models.CharField('最寄駅', max_length=32, blank=True)
     health = models.TextField('健康状態', max_length=256, blank=True)
-    company_cd = models.ForeignKey(MstCompany, on_delete=models.CASCADE, blank=True, null=True)
+    company_id = models.ForeignKey(MstCompany, on_delete=models.CASCADE, blank=True, null=True, verbose_name='企業ID')
 
     class Meta:
         db_table = 'tbl_person'
 
 
 class TblQualification(models.Model):
-    user_id = models.ForeignKey(Account, on_delete=models.CASCADE)
-    qualification_cd = models.ForeignKey(MstQualification, on_delete=models.CASCADE)
+    id = models.AutoField('ID', primary_key=True)
+    user_id = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name='ユーザーID')
+    qualification_id = models.ForeignKey(MstQualification, on_delete=models.CASCADE, verbose_name='資格ID')
     acquisition_date = models.DateField('取得年月日', blank=True, null=True)
 
     class Meta:
         db_table = 'tbl_qualification'
         unique_together = (
-            ('user_id', 'qualification_cd'),
+            ('user_id', 'qualification_id'),
         )
 
 
 class TblCareer(models.Model):
-    user_id = models.ForeignKey(Account, on_delete=models.CASCADE)
+    id = models.AutoField('ID', primary_key=True)
+    user_id = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name='ユーザーID')
     career_no = models.IntegerField('経歴NO')
     start_date = models.DateField('開始日')
     end_date = models.DateField('終了日', blank=True, null=True)
@@ -227,7 +230,7 @@ class TblCareer(models.Model):
     work_type = models.IntegerField('作業区分', blank=True, null=True)
     member_count = models.IntegerField('メンバー数', blank=True, null=True)
     position = models.IntegerField('ポジション', blank=True, null=True)
-    company_cd = models.ForeignKey(MstCompany, on_delete=models.CASCADE, blank=True, null=True)
+    company_id = models.ForeignKey(MstCompany, on_delete=models.CASCADE, blank=True, null=True, verbose_name='企業ID')
     nearest_station = models.CharField('最寄り駅', max_length=32, blank=True)
 
     def __str__(self):
@@ -238,50 +241,53 @@ class TblCareer(models.Model):
         unique_together = (
             ('user_id', 'career_no'),
         )
-    
 
 
 class TblCareerOs(models.Model):
-    career = models.ForeignKey(TblCareer, on_delete=models.CASCADE)
-    os_cd = models.ForeignKey(MstOS, on_delete=models.CASCADE)
+    id = models.AutoField('ID', primary_key=True)
+    career_id = models.ForeignKey(TblCareer, on_delete=models.CASCADE, verbose_name='経歴ID')
+    os_id = models.ForeignKey(MstOS, on_delete=models.CASCADE, verbose_name='OSID')
     disp_order = models.IntegerField('表示順')
 
     class Meta:
         db_table = 'tbl_career_os'
         unique_together = (
-            ('career', 'os_cd'),
+            ('career_id', 'os_id'),
         )
 
 class TblCareerLanguage(models.Model):
-    career = models.ForeignKey(TblCareer, on_delete=models.CASCADE)
-    language_cd = models.ForeignKey(MstLanguage, on_delete=models.CASCADE)
+    id = models.AutoField('ID', primary_key=True)
+    career_id = models.ForeignKey(TblCareer, on_delete=models.CASCADE, verbose_name='経歴ID')
+    language_id = models.ForeignKey(MstLanguage, on_delete=models.CASCADE, verbose_name='言語ID')
     disp_order = models.IntegerField('表示順')
 
     class Meta:
         db_table = 'tbl_career_language'
         unique_together = (
-            ('career', 'language_cd')
+            ('career_id', 'language_id')
         )
 
 class TblCareerTool(models.Model):
-    career = models.ForeignKey(TblCareer, on_delete=models.CASCADE)
-    tool_cd = models.ForeignKey(MstTool, on_delete=models.CASCADE)
+    id = models.AutoField('ID', primary_key=True)
+    career_id = models.ForeignKey(TblCareer, on_delete=models.CASCADE, verbose_name='経歴ID')
+    tool_id = models.ForeignKey(MstTool, on_delete=models.CASCADE, verbose_name='ツールID')
     disp_order = models.IntegerField('表示順')
 
     class Meta:
         db_table = 'tbl_career_tool'
         unique_together = (
-            ('career', 'tool_cd')
+            ('career_id', 'tool_id')
         )
 
 class TblCareerDB(models.Model):
-    career = models.ForeignKey(TblCareer, on_delete=models.CASCADE)
-    db_cd = models.ForeignKey(MstDB, on_delete=models.CASCADE)
+    id = models.AutoField('ID', primary_key=True)
+    career_id = models.ForeignKey(TblCareer, on_delete=models.CASCADE, verbose_name='経歴ID')
+    db_id = models.ForeignKey(MstDB, on_delete=models.CASCADE, verbose_name='DBID')
     disp_order = models.IntegerField('表示順')
 
     class Meta:
         db_table = 'tbl_career_db'
         unique_together = (
-            ('career', 'db_cd')
+            ('career_id', 'db_id')
         )
 

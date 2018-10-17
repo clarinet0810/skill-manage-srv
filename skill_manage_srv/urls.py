@@ -16,6 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+admin.site.site_title = 'スキル管理システムの管理画面'
+admin.site.site_header = 'スキル管理システムの管理画面'
+admin.site.index_title = 'メニュー'
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/', include('api.urls'))

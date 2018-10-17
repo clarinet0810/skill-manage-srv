@@ -8,5 +8,7 @@ class LoginSerializer(serializers.Serializer):
 class TblPersonSerializer(serializers.ModelSerializer):
     class Meta:
         model = TblPerson
-        fields = ('last_name', 'last_name_kana')
+        fields = (
+            'user_id', 'last_name', 'last_name_kana', 'first_name', 'first_name_kana', 'initial', 'birthday',
+            'nearest_station', 'health', 'company_id')
 

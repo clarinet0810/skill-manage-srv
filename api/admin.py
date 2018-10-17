@@ -17,7 +17,7 @@ from .models import TblCareerTool
 from .models import TblCareerDB
 
 class AccountAdmin(admin.ModelAdmin):
-    list_display = ('user_id', 'email', 'is_staff')   
+    list_display = ('id', 'email', 'is_staff')   
 admin.site.register(Account, AccountAdmin)
 
 class AccountTokenAdmin(admin.ModelAdmin):
@@ -25,31 +25,31 @@ class AccountTokenAdmin(admin.ModelAdmin):
 admin.site.register(AccountToken, AccountTokenAdmin)
 
 class MstClassAdmin(admin.ModelAdmin):
-    list_display = ('class_cd', 'class_name', 'type_1', 'type_2', 'type_3')
+    list_display = ('id', 'class_name', 'type_1', 'type_2', 'type_3')
 admin.site.register(MstClass, MstClassAdmin)
 
 class MstCompanyAdmin(admin.ModelAdmin):
-    list_display = ('company_cd', 'seq_no', 'company_name')
+    list_display = ('id', 'seq_no', 'company_name')
 admin.site.register(MstCompany, MstCompanyAdmin)
 
 class MstQualificationAdmin(admin.ModelAdmin):
-    list_display = ('qualification_cd', 'seq_no', 'qualification_name')
+    list_display = ('id', 'seq_no', 'qualification_name')
 admin.site.register(MstQualification, MstQualificationAdmin)
 
 class MstOSAdmin(admin.ModelAdmin):
-    list_display = ('os_cd', 'os_name')
+    list_display = ('id', 'os_name')
 admin.site.register(MstOS, MstOSAdmin)
 
 class MstLanguageAdmin(admin.ModelAdmin):
-    list_display = ('language_cd', 'language_name')
+    list_display = ('id', 'language_name')
 admin.site.register(MstLanguage, MstLanguageAdmin)
 
 class MstToolAdmin(admin.ModelAdmin):
-    list_display = ('tool_cd', 'tool_name')
+    list_display = ('id', 'tool_name')
 admin.site.register(MstTool, MstToolAdmin)
 
 class MstDBAdmin(admin.ModelAdmin):
-    list_display = ('db_cd', 'db_name')
+    list_display = ('id', 'db_name')
 admin.site.register(MstDB, MstDBAdmin)
 
 class TblPersonAdmin(admin.ModelAdmin):
@@ -57,7 +57,7 @@ class TblPersonAdmin(admin.ModelAdmin):
 admin.site.register(TblPerson, TblPersonAdmin)
 
 class TblQualificationAdmin(admin.ModelAdmin):
-    list_display = ('user_id', 'qualification_cd', 'acquisition_date')
+    list_display = ('id', 'user_id', 'qualification_id', 'acquisition_date')
 admin.site.register(TblQualification, TblQualificationAdmin)
 
 class TblCareerAdmin(admin.ModelAdmin):
@@ -65,17 +65,17 @@ class TblCareerAdmin(admin.ModelAdmin):
 admin.site.register(TblCareer, TblCareerAdmin)
 
 class TblCareerOsAdmin(admin.ModelAdmin):
-    list_display = ('career', 'os_cd', 'disp_order')
+    list_display = ('id', 'career_id', 'os_id', 'disp_order')
 admin.site.register(TblCareerOs, TblCareerOsAdmin)
 
 class TblCareerLanguageAdmin(admin.ModelAdmin):
-    list_display = ('career', 'language_cd', 'disp_order')
+    list_display = ('id', 'career_id', 'language_id', 'disp_order')
 admin.site.register(TblCareerLanguage, TblCareerLanguageAdmin)
 
 class TblCareerToolAdmin(admin.ModelAdmin):
-    list_display = ('career', 'tool_cd', 'disp_order')
+    list_display = ('id', 'career_id', 'tool_id', 'disp_order')
 admin.site.register(TblCareerTool, TblCareerToolAdmin)
 
 class TblCareerDbAdmin(admin.ModelAdmin):
-    list_display = ('career', 'db_cd', 'disp_order')
+    list_display = ('id', 'career_id', 'db_id', 'disp_order')
 admin.site.register(TblCareerDB, TblCareerDbAdmin)

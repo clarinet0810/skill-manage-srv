@@ -39,7 +39,7 @@ class Login(mixins.CreateModelMixin, generics.GenericAPIView):
         token = AccountToken.create(account)
 
         # トークンを返却
-        return JsonResponse({'user_id': account.user_id, 'token': token.token})
+        return JsonResponse({'user_id': account.id, 'token': token.token})
 
 
 class PersonViewSet(viewsets.ModelViewSet):
